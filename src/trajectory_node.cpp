@@ -91,16 +91,26 @@ int main(int argc, char ** argv){
     auto pseudo_inverse_ = rl::math::Matrix(numDof, 6);
 
 
-    model.forwardPosition();
+
+
     rl::math::Transform startEEPos = model.getOperationalPosition(endEffectorIndex);
     rl::math::Transform curEEPos = model.getOperationalPosition(endEffectorIndex);
     auto startPos = model.getPosition();
-    auto curPos = model.getPosition();
+        startPos[0] =  0;
+    startPos[1] =  -1.5700000000000001;
+    startPos[2] =  1.5700000000000001;
+    startPos[3] =  -1.5700000000000001;
+    startPos[4] =  -1.5700000000000001;
+    startPos[5] =  0;
 
-    double totalTime = 4; // seconds
+//    auto curPos = model.getPosition();
+
+    model.forwardPosition();
+
+    double totalTime = 5; // seconds
     int numPoints = 50;
     double mag = 0.4;
-    int numLoops = 10;
+    int numLoops = 5;
 
     double* T = startEEPos.data();
     printT(T);
