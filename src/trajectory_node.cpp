@@ -72,10 +72,23 @@ int main(int argc, char ** argv){
     rclcpp::Clock ros_clock(rcl_clock_type_e::RCL_ROS_TIME);
     jointTrajectoryMsg.header.stamp = ros_clock.now();
     jointTrajectoryMsg.header.frame_id = "world";
+
+    std::unordered_set<std::string> control_joint = {"shoulder_pan_joint",
+                                                     "shoulder_lift_joint",
+                                                     "elbow_joint",
+                                                     "wrist_1_joint",
+                                                     "wrist_2_joint",
+                                                     "wrist_3_joint"};
+    std::vector<int> control_inds;
     for (int  i =0; i < model.getJoints(); i++){
-        jointTrajectoryMsg.joint_names.push_back(model.getJoint(i)->getName());
+        if (control_joint.find(model.getJoint(i)->getName()) != control_joint.end()){
+            jointTrajectoryMsg.joint_names.push_back(model.getJoint(i)->getName());
+            control_inds.push_back(i);
+        }
     }
 
+//    auto command_pub = node->create_publisher<trajectory_msgs::msg::JointTrajectory>(
+//            std::string("admittance_controller/joint_trajectory"), rclcpp::SystemDefaultsQoS());
     auto command_pub = node->create_publisher<trajectory_msgs::msg::JointTrajectory>(
             std::string("admittance_controller/joint_trajectory"), rclcpp::SystemDefaultsQoS());
 
@@ -91,11 +104,11 @@ int main(int argc, char ** argv){
     auto pseudo_inverse_ = rl::math::Matrix(numDof, 6);
 
 
-
-
-    rl::math::Transform startEEPos = model.getOperationalPosition(endEffectorIndex);
-    rl::math::Transform curEEPos = model.getOperationalPosition(endEffectorIndex);
-    auto startPos = model.getPosition();
+//    rl::math::Transform startEEPos = model.getOperationalPosition(endEffectorIndex);
+//    rl::math::Transform curEEPos = model.getOperationalPosition(endEffectorIndex);
+//    auto startPos = model.getPosition();
+    std::vector<double> startPos;
+    startPos.resize(6);
         startPos[0] =  0;
     startPos[1] =  -1.5700000000000001;
     startPos[2] =  1.5700000000000001;
@@ -112,12 +125,12 @@ int main(int argc, char ** argv){
     double mag = 0.4;
     int numLoops = 5;
 
-    double* T = startEEPos.data();
-    printT(T);
-    double yaw;
-    double pitch;
-    double roll;
-    GetRotation(yaw, pitch,  roll, *((Transform*)T));
+//    double* T = startEEPos.data();
+//    printT(T);
+//    double yaw;
+//    double pitch;
+//    double roll;
+//    GetRotation(yaw, pitch,  roll, *((Transform*)T));
 
 //    for (double phase =0; phase < 2*M_PI; phase+= 2*M_PI/numPoints){
 double timeOffset = 0;
@@ -148,7 +161,7 @@ for (int n= 0 ; n < numLoops; n++){
         point.positions.resize(6);
         point.velocities.resize(6, 0.0);
 
-        for (int  i =0; i < model.getJoints(); i++){
+        for (int  i =0; i < startPos.size(); i++){
             point.positions[i] = startPos[i];
         }
 
