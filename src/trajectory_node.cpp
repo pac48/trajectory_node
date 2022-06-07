@@ -120,10 +120,10 @@ int main(int argc, char ** argv){
 
     model.forwardPosition();
 
-    double totalTime = 5; // seconds
+    double totalTime = 8; // seconds
     int numPoints = 50;
-    double mag = 0.4;
-    int numLoops = 5;
+    double mag = 0.2;
+    int numLoops = 3;
 
 //    double* T = startEEPos.data();
 //    printT(T);
